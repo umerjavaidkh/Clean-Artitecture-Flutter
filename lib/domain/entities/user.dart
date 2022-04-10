@@ -4,8 +4,9 @@ class User  extends Equatable {
   final String name;
   final String email;
   final String token;
+  final String url;
 
- const User({this.id,this.name,this.email,this.token});
+ const User({this.id,this.name,this.email,this.token,this.url});
 
   @override
   List<Object> get props {
@@ -14,6 +15,7 @@ class User  extends Equatable {
       name,
       email,
       token,
+      url
     ];
   }
 

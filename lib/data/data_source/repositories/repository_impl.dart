@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import '../../../core/params/article_request.dart';
+import '../../../core/params/request_params.dart';
 import '../../../core/resources/data_state.dart';
 import '../../../domain/entities/article.dart';
 import '../../../domain/entities/user.dart';

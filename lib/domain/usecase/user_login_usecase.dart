@@ -1,4 +1,5 @@
-import '../../core/params/article_request.dart';
+
+import '../../core/params/request_params.dart';
 import '../../core/resources/data_state.dart';
 import '../../core/usecase/usecase.dart';
 import '../entities/user.dart';

@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import '../../../core/bloc/bloc_with_state.dart';
-import '../../../core/params/article_request.dart';
+import '../../../core/params/request_params.dart';
 import '../../../core/resources/data_state.dart';
 import '../../../domain/entities/user.dart';
-import '../../../domain/usecase/get_articles_usecase.dart';
+import '../../../domain/usecase/user_login_usecase.dart';
+
 
 
 part 'remote_user_login_event.dart';

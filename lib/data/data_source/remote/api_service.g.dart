@@ -9,7 +9,7 @@ part of 'api_service.dart';
 class _ApiService implements ApiService {
   _ApiService(this._dio, {this.baseUrl}) {
     ArgumentError.checkNotNull(_dio, '_dio');
-    baseUrl;
+    baseUrl=BaseUrl;
   }
 
   final Dio _dio;
@@ -21,17 +21,18 @@ class _ApiService implements ApiService {
       email, password) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
-      r'email': email,
-      r'password': password,
     };
     queryParameters.removeWhere((k, v) => v == null);
-    final _data = <String, dynamic>{};
+    final _data = <String, dynamic>{
+      'email': email,
+      'password': password,
+    };
     final _headers = <String, dynamic>{};
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<APIResponse>(
-            Options(method: 'GET', headers: _headers, extra: _extra)
-                .compose(_dio.options, 'everything',
-                queryParameters: queryParameters, data: _data)
+            Options(method: 'POST', headers: _headers, extra: _extra)
+                .compose(_dio.options, '/login',
+                queryParameters: queryParameters, data: jsonEncode(_data))
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = APIResponse.fromJson(_result.data);
 
@@ -45,17 +46,18 @@ class _ApiService implements ApiService {
       email, password,username) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
-      r'email': email,
-      r'password': password,
-      r'username': username,
     };
     queryParameters.removeWhere((k, v) => v == null);
-    final _data = <String, dynamic>{};
+    final _data = <String, dynamic>{
+      'email': email,
+      'password': password,
+      'name': username,
+    };
     final _headers = <String, dynamic>{};
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<APIResponse>(
             Options(method: 'POST', headers: _headers, extra: _extra)
-                .compose(_dio.options, 'everything',
+                .compose(_dio.options, '/registration',
                 queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = APIResponse.fromJson(_result.data);

@@ -7,20 +7,22 @@ class Data extends User{
   final String name;
   final String email;
   final String token;
+  final String url;
 
-  Data({this.id,this.name,this.email,this.token}):super(
+  Data({this.id,this.name,this.email,this.token,this.url}):super(
     id: id,
     name: name,
     email: email,
     token: token,
+    url: url,
   );
 
   factory Data.fromJson(Map<String, dynamic> json){
     return Data(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      email: json['email'] as String,
-      token: json['token'] as String,
+      id: json['Id'].toString(),
+      name: json['Name'] ,
+      email: json['Email'],
+      token: json['Token'],
     );
   }
 }

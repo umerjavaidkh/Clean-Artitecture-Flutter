@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_clean_architecture/utils/extentions.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
+import '../../core/params/request_params.dart';
+import '../../domain/entities/user.dart';
+import '../blocs/user_login/remote_user_login_bloc.dart';
 import 'helper.dart';
 import 'signUp_screen.dart';
 
@@ -10,61 +16,94 @@ class ScreenLogin extends StatefulWidget {
 }
 
 class _ScreenLoginState extends State<ScreenLogin> {
+
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: [
+      'email',
+      'https://www.googleapis.com/auth/contacts.readonly',
+    ],
+  );
+
+  GoogleSignInAccount _currentUser;
+
+  TextEditingController _emailEditingController= TextEditingController();
+  TextEditingController _passEditingController= TextEditingController();
+
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
+      setState(() {
+        _currentUser = account;
+      });
+      if (_currentUser != null) {
+        _handleGetContact(_currentUser);
+      }
+    });
+    _googleSignIn.signInSilently();
+
+  }
+
+
+  Future<void> _handleGetContact(GoogleSignInAccount user) async {
+    print("$user");
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context).size;
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(
-          backgroundColor: Colors.black,
-          leading: buildButton(),
-          title: Text(
-            "Log in",
-            style: textStyle,
-          ),
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 15,
+    return SafeArea(child: BlocConsumer<RemoteUserLoginBloc,UserState>(
+        listener: (context,state){
+          if(state is UserLoginDone)
+            Navigator.pushNamed(context, '/dashboard',arguments:state.user);
+        },
+        builder: (context, state){
+
+          return Scaffold(
+            backgroundColor: Colors.black,
+            appBar: AppBar(
+              backgroundColor: Colors.black,
+              //leading: buildButton(),
+              title: Text(
+                "Log in",
+                style: textStyle,
               ),
-              buildText(
-                  name: "Log in with one of following options",
-                  choose: textStyle1),
-              buildGoogleAppleFunction(mq),
-              buildText(name: "Email", choose: textStyle2),
-              buildEmailField(),
-              buildText(name: "Password", choose: textStyle2),
-              buildPasswordField(),
-              SizedBox(
-                height: 25,
-              ),
-              buildTaptoLogin(),
-              buildTaptoSignup(context),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+            body:
+            SingleChildScrollView(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    buildGoogleAppleFunction(mq),
+                    buildText(name: "Email", choose: textStyle2),
+                    buildEmailField(),
+                    buildText(name: "Password", choose: textStyle2),
+                    buildPasswordField(),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    buildTaptoLogin(),
+                    buildTaptoSignup(context),
+                  ],
+                ),),
+            ),
+          );
+
+        }));
+
+
   }
 
-  Widget buildButton() {
-    return OutlinedButton(
-        style: OutlinedButton.styleFrom(
-            side: BorderSide(color: Colors.grey),
-            elevation: 15.0,
-            minimumSize: Size(20, 50),
-            primary: Colors.red,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15))),
-        onPressed: () {
-          print("Icon Touch");
-        },
-        child: Icon(Icons.arrow_back_ios, color: Colors.white));
-  }
+
 
   Widget buildText({String name, TextStyle choose}) {
     return Padding(
@@ -80,7 +119,7 @@ class _ScreenLoginState extends State<ScreenLogin> {
     return Padding(
       padding: const EdgeInsets.only(top: 13, left: 5, right: 3, bottom: 25),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -88,34 +127,19 @@ class _ScreenLoginState extends State<ScreenLogin> {
                 style: OutlinedButton.styleFrom(
                     side: BorderSide(color: Colors.grey),
                     elevation: 15.0,
-                    minimumSize: Size(mq.width * 0.4, 50),
+                    minimumSize: Size(mq.width * 0.8, 50),
                     primary: Colors.red,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15))),
                 onPressed: () {
-                  print("Icon Google");
+                  _handleSignIn();
                 },
-                child: Icon(
+                child: const Icon(
                   FontAwesomeIcons.google,
                   color: Colors.white,
                 )),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: Colors.grey),
-                    elevation: 15.0,
-                    minimumSize: Size(mq.width * 0.4, 50),
-                    primary: Colors.red,
-                    // backgroundColor: Colors.grey,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15))),
-                onPressed: () {
-                  print("Icon Apple");
-                },
-                child: Icon(FontAwesomeIcons.apple, color: Colors.white)),
-          ),
+
         ],
       ),
     );
@@ -125,33 +149,58 @@ class _ScreenLoginState extends State<ScreenLogin> {
     return Padding(
       padding: const EdgeInsets.only(top: 15, left: 15, right: 15),
       child: ElevatedButton(
-        onPressed: () {},
-        child: Text("Log in"),
+        onPressed: () {
+
+          if(_formKey.currentState.validate()) {
+            String email = _emailEditingController.text;
+            String pass = _passEditingController.text;
+            context.read<RemoteUserLoginBloc>().add(LoginUserEvent(
+                LoginRequestParams(email: email, password: pass)));
+          }
+        },
+        child:const Text("Log in",style: TextStyle(color: Colors.black),),
         style: ElevatedButton.styleFrom(
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            minimumSize: Size(500, 48),
-            primary: Colors.purpleAccent[400]),
+            minimumSize: const Size(500, 48),
+            primary: Colors.white),
       ),
     );
+  }
+
+  // we can do the same with google signin by creating bloc and usecasd
+  Future<void> _handleSignIn() async {
+    try {
+     var result = await _googleSignIn.signIn();
+     if(result!=null){
+       var user = User(name: result.displayName,id: result.id,email: result.email,url: result.photoUrl);
+       Navigator.pushNamed(context, "dashboard",arguments: user);
+     }
+    } catch (error) {
+      print(error);
+    }
   }
 
   Widget buildPasswordField() {
     return Padding(
       padding: const EdgeInsets.only(top: 15, left: 5, right: 3),
       child: TextFormField(
+        validator: (text){
+          return text.isNotEmpty ? null : "Password missing";
+        },
+        controller: _passEditingController,
         cursorColor: Colors.white,
         style: textStyle2,
         keyboardType: TextInputType.visiblePassword,
         obscureText: true,
         decoration: InputDecoration(
             enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.pinkAccent),
+                borderSide: BorderSide(color: Colors.white),
                 borderRadius: BorderRadius.circular(20)),
             hintStyle: textStyle1,
             hintText: "Enter your password",
             border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.pinkAccent),
+                borderSide:const BorderSide(color:  Colors.white),
                 borderRadius: BorderRadius.circular(20))),
       ),
     );
@@ -161,17 +210,21 @@ class _ScreenLoginState extends State<ScreenLogin> {
     return Padding(
       padding: const EdgeInsets.only(top: 15, left: 5, right: 3),
       child: TextFormField(
+        validator: (text){
+          return text.isValidEmail() ? null : "Check your email";
+        },
+        controller: _emailEditingController,
         cursorColor: Colors.white,
         style: textStyle2,
         keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
             enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.pinkAccent),
+                borderSide: const  BorderSide(color: Colors.white),
                 borderRadius: BorderRadius.circular(20)),
             hintStyle: textStyle1,
-            hintText: "hello@login.com",
+            hintText: "Enter Email",
             border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.pinkAccent),
+                borderSide: const BorderSide(color: Colors.white),
                 borderRadius: BorderRadius.circular(20))),
       ),
     );
@@ -187,18 +240,19 @@ class _ScreenLoginState extends State<ScreenLogin> {
             "Don't have an account?",
             style: textStyle1,
           ),
-          SizedBox(
+         const SizedBox(
             width: 8,
           ),
           TextButton(
               onPressed: () {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => ScreenSignup()));
+                /*Navigator.push(
+                    context, MaterialPageRoute(builder: (_) => ScreenSignup()));*/
+                Navigator.pushNamed(context, '/signup');
               },
-              child: Text(
+              child: const Text(
                 "Sign up",
                 style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ))
         ],
       ),

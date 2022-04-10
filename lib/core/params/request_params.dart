@@ -1,21 +1,22 @@
 import '../utils/constants.dart';
 
-class LoginRequestParams {
+
+class LoginRequestParams{
   final String email;
   final String password;
 
-  const LoginRequestParams({
+   LoginRequestParams({
     this.email,
     this.password
   });
 }
 
-class RegisterRequestParams {
+class RegisterRequestParams{
   final String email;
   final String password;
   final String username;
 
-  const RegisterRequestParams({
+   RegisterRequestParams({
     this.email,
     this.password,
     this.username
