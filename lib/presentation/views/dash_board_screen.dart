@@ -30,7 +30,7 @@ class DashboardScreen extends StatelessWidget {
                     children: [
                         CircleAvatar(
                         backgroundImage: NetworkImage(
-                         user.url??"https://www.trendrr.net/wp-content/uploads/2017/06/Deepika-Padukone-1.jpg"
+                         user.url??"https://cdn-icons-png.flaticon.com/128/3135/3135715.png"
                         ),
                         radius: 50.0,
                       ),
