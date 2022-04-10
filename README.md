@@ -1,16 +1,24 @@
-# flutter_clean_architecture
+# Clean Archtecture
 
-Flutter Clean Architecture.
+A simple app to shows login signup. App built with Bloc architecture using  GetIt, Dart, Providers, Google signin.
+Google sign in is pending for approved with Google maybe not word as expected.
 
-## Getting Started
+<br>
+<p align="center">
+    <img src="sc_shot_dark_1.png" width="300"/>
+    <img src="sc_shot_dark_2.png" width="300"/>
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+</p>
+<br>
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## The app has following layers:
+1. **core**: Contains generic implemtation of other layers.
+1. **data**: It contains all the data accessing, repositories and manipulating components.
+2. **injection_container**: Dependency providing classes using GetIt.
+3. **domain**: It contains entities, usecase or repositories.
+4. **presentation**:Bloc and repective UI screens.
+#### Classes have been designed in such a way that it could be inherited and maximize the code reuse.
+<br>
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
