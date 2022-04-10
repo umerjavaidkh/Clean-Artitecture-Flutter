@@ -5,7 +5,7 @@ import '../../../core/params/request_params.dart';
 import '../../../core/resources/data_state.dart';
 import '../../../domain/entities/article.dart';
 import '../../../domain/entities/user.dart';
-import '../../../domain/repositories/articles_repository.dart';
+import '../../../domain/repositories/repository.dart';
 import '../remote/api_service.dart';
 
 
